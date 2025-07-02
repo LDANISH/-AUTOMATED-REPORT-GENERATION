@@ -1,0 +1,51 @@
+import pandas as pd
+from fpdf import FPDF
+df = pd.read_csv("employee_data.csv")
+def calculate_deductions(salary):
+    pf = salary * 0.12
+    tax = salary * 0.08
+    total_deduction = pf + tax
+    net_salary = salary - total_deduction
+    return pf, tax, total_deduction, net_salary
+df[['PF', 'Tax', 'TotalDeduction', 'NetSalary']] = df['GrossSalary'].apply(
+    lambda s: pd.Series(calculate_deductions(s))
+)
+class PDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 14)
+        self.cell(0, 10, 'Employee Salary Report', ln=True, align='C')
+        self.ln(5)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Page {self.page_no()}', align='C')
+
+    def employee_table(self, df):
+        self.set_font('Arial', 'B', 10)
+        col_widths = [20, 35, 30, 25, 20, 20, 25, 25]
+        headers = ['ID', 'Name', 'Department', 'Gross', 'PF', 'Tax', 'Deduction', 'Net']
+
+        for i, col in enumerate(headers):
+            self.cell(col_widths[i], 10, col, 1, 0, 'C')
+        self.ln()
+
+       
+        self.set_font('Arial', '', 10)
+        for _, row in df.iterrows():
+            self.cell(col_widths[0], 10, str(row['EmployeeID']), 1)
+            self.cell(col_widths[1], 10, row['Name'], 1)
+            self.cell(col_widths[2], 10, row['Department'], 1)
+            self.cell(col_widths[3], 10, f"{row['GrossSalary']:.0f}", 1)
+            self.cell(col_widths[4], 10, f"{row['PF']:.0f}", 1)
+            self.cell(col_widths[5], 10, f"{row['Tax']:.0f}", 1)
+            self.cell(col_widths[6], 10, f"{row['TotalDeduction']:.0f}", 1)
+            self.cell(col_widths[7], 10, f"{row['NetSalary']:.0f}", 1)
+            self.ln()
+
+pdf = PDF()
+pdf.add_page()
+pdf.employee_table(df)
+pdf.output("employee_salary_report.pdf")
+
+print("✅ Report generated: employee_salary_report.pdf")
