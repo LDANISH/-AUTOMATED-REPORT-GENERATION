@@ -24,6 +24,11 @@ Exporting results in a professional-looking PDF report
 Python 3
 Pandas – for data handling and analysis
 FPDF / ReportLab – for creating PDF documents
-Matplotlib (optional) – for adding charts to PDF
+Matplotlib (optional) – for adding charts to PDF 
+
+##OUTPUT
+
+
+[employee_salary_report.pdf](https://github.com/user-attachments/files/21015653/employee_salary_report.pdf)
 
 
